@@ -17,6 +17,12 @@ class ViewController: UIViewController {
     var movingCellNeedsToShow = false
     var movingCellInitialIndexPath: IndexPath?
     
+    
+    let kAnimationDuration: TimeInterval = 0.25
+    let kVisibleAlpha: CGFloat = 1
+    let kInvisibleAlpha: CGFloat = 0
+    let kTranslucentAlpha: CGFloat = 0.98
+    let kTransformScaleXY: CGFloat = 1.05
     @IBOutlet var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -48,75 +54,13 @@ class ViewController: UIViewController {
         
         switch state {
         case UIGestureRecognizerState.began:
-            self.movingCellInitialIndexPath = indexPath
-            guard let cell = self.tableView.cellForRow(at: indexPath) else {
-                return
-            }
-            let snapshotView = snapshotOfCell(cell)
-            movingCellSnapshotView = snapshotView
-            var center = cell.center
-            snapshotView.center = center
-            snapshotView.alpha = 0.0
-            tableView.addSubview(snapshotView)
-            UIView.animate(withDuration: 0.25, animations: { () -> Void in
-                center.y = locationInView.y
-                self.movingCellIsAnimating = true
-                snapshotView.center = center
-                snapshotView.transform = CGAffineTransform(scaleX: 1.05, y: 1.05)
-                snapshotView.alpha = 0.98
-                cell.alpha = 0.0
-            }, completion: { (finished) -> Void in
-                if finished {
-                    self.movingCellIsAnimating = false
-                    if self.movingCellNeedsToShow {
-                        self.movingCellNeedsToShow = false
-                        UIView.animate(withDuration: 0.25, animations: { () -> Void in
-                            cell.alpha = 1
-                        })
-                    } else {
-                        cell.isHidden = true
-                    }
-                }
-            })
+            self.createSnapshotOfMovingCell(indexPath: indexPath, locationInView: locationInView)
+            
         case UIGestureRecognizerState.changed:
-            guard let snapshotView = self.movingCellSnapshotView,
-                let intialIndexPath = self.movingCellInitialIndexPath else {
-                return
-            }
-            var center = snapshotView.center
-            center.y = locationInView.y
-            snapshotView.center = center
-            if indexPath != intialIndexPath {
-                self.itemsArray.insert(self.itemsArray.remove(at: intialIndexPath.section), at: indexPath.section)
-                self.tableView.moveSection(intialIndexPath.section, toSection: indexPath.section)
-                self.movingCellInitialIndexPath = indexPath
-            }
+            self.updateModelWithMovingCell(indexPath: indexPath, locationInView: locationInView)
+            
         default:
-            guard let initialIndexPath = self.movingCellInitialIndexPath,
-                let cell = self.tableView.cellForRow(at: initialIndexPath),
-                let snapshotView = self.movingCellSnapshotView else {
-                return
-            }
-
-            if self.movingCellIsAnimating {
-                self.movingCellNeedsToShow = true
-            } else {
-                cell.isHidden = false
-                cell.alpha = 0.0
-            }
-            UIView.animate(withDuration: 0.25, animations: { () -> Void in
-                snapshotView.center = cell.center
-                snapshotView.transform = CGAffineTransform.identity
-                snapshotView.alpha = 0.0
-                cell.alpha = 1.0
-            }, completion: { (finished) -> Void in
-                if finished {
-                    print(self.itemsArray)
-                    self.movingCellInitialIndexPath = nil
-                    self.movingCellSnapshotView!.removeFromSuperview()
-                    self.movingCellSnapshotView = nil
-                }
-            })
+            self.finalizeReorder()
         }
     }
     
@@ -132,6 +76,81 @@ class ViewController: UIViewController {
         snapshotView.layer.shadowRadius = 5.0
         snapshotView.layer.shadowOpacity = 0.4
         return snapshotView
+    }
+    
+    func createSnapshotOfMovingCell(indexPath: IndexPath, locationInView: CGPoint) {
+        self.movingCellInitialIndexPath = indexPath
+        guard let cell = self.tableView.cellForRow(at: indexPath) else {
+            return
+        }
+        let snapshotView = snapshotOfCell(cell)
+        movingCellSnapshotView = snapshotView
+        var center = cell.center
+        snapshotView.center = center
+        snapshotView.alpha = self.kInvisibleAlpha
+        tableView.addSubview(snapshotView)
+        UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
+            center.y = locationInView.y
+            self.movingCellIsAnimating = true
+            snapshotView.center = center
+            snapshotView.transform = CGAffineTransform(scaleX: self.kTransformScaleXY, y: self.kTransformScaleXY)
+            snapshotView.alpha = self.kTranslucentAlpha
+            cell.alpha = self.kInvisibleAlpha
+        }, completion: { (finished) -> Void in
+            if finished {
+                self.movingCellIsAnimating = false
+                if self.movingCellNeedsToShow {
+                    self.movingCellNeedsToShow = false
+                    UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
+                        cell.alpha = self.kVisibleAlpha
+                    })
+                } else {
+                    cell.isHidden = true
+                }
+            }
+        })
+    }
+    
+    func updateModelWithMovingCell(indexPath: IndexPath, locationInView: CGPoint) {
+        guard let snapshotView = self.movingCellSnapshotView,
+            let intialIndexPath = self.movingCellInitialIndexPath else {
+                return
+        }
+        var center = snapshotView.center
+        center.y = locationInView.y
+        snapshotView.center = center
+        if indexPath != intialIndexPath {
+            self.itemsArray.insert(self.itemsArray.remove(at: intialIndexPath.section), at: indexPath.section)
+            self.tableView.moveSection(intialIndexPath.section, toSection: indexPath.section)
+            self.movingCellInitialIndexPath = indexPath
+        }
+    }
+    
+    func finalizeReorder() {
+        guard let initialIndexPath = self.movingCellInitialIndexPath,
+            let cell = self.tableView.cellForRow(at: initialIndexPath),
+            let snapshotView = self.movingCellSnapshotView else {
+                return
+        }
+        
+        if self.movingCellIsAnimating {
+            self.movingCellNeedsToShow = true
+        } else {
+            cell.isHidden = false
+            cell.alpha = self.kInvisibleAlpha
+        }
+        UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
+            snapshotView.center = cell.center
+            snapshotView.transform = CGAffineTransform.identity
+            snapshotView.alpha = self.kInvisibleAlpha
+            cell.alpha = self.kVisibleAlpha
+        }, completion: { (finished) -> Void in
+            if finished {
+                self.movingCellInitialIndexPath = nil
+                self.movingCellSnapshotView!.removeFromSuperview()
+                self.movingCellSnapshotView = nil
+            }
+        })
     }
 }
 
