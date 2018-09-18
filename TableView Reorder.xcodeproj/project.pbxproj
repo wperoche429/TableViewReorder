@@ -12,6 +12,8 @@
 		2281605021518CE900B1A77B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2281604E21518CE900B1A77B /* Main.storyboard */; };
 		2281605221518CEB00B1A77B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2281605121518CEB00B1A77B /* Assets.xcassets */; };
 		2281605521518CEB00B1A77B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2281605321518CEB00B1A77B /* LaunchScreen.storyboard */; };
+		2281605E21518D4900B1A77B /* AccountCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2281605C21518D4900B1A77B /* AccountCell.swift */; };
+		2281605F21518D4900B1A77B /* AccountCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2281605D21518D4900B1A77B /* AccountCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		2281605121518CEB00B1A77B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2281605421518CEB00B1A77B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		2281605621518CEB00B1A77B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2281605C21518D4900B1A77B /* AccountCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountCell.swift; sourceTree = "<group>"; };
+		2281605D21518D4900B1A77B /* AccountCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AccountCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +60,8 @@
 			children = (
 				2281604A21518CE900B1A77B /* AppDelegate.swift */,
 				2281604C21518CE900B1A77B /* ViewController.swift */,
+				2281605C21518D4900B1A77B /* AccountCell.swift */,
+				2281605D21518D4900B1A77B /* AccountCell.xib */,
 				2281604E21518CE900B1A77B /* Main.storyboard */,
 				2281605121518CEB00B1A77B /* Assets.xcassets */,
 				2281605321518CEB00B1A77B /* LaunchScreen.storyboard */,
@@ -123,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2281605521518CEB00B1A77B /* LaunchScreen.storyboard in Resources */,
+				2281605F21518D4900B1A77B /* AccountCell.xib in Resources */,
 				2281605221518CEB00B1A77B /* Assets.xcassets in Resources */,
 				2281605021518CE900B1A77B /* Main.storyboard in Resources */,
 			);
@@ -137,6 +144,7 @@
 			files = (
 				2281604D21518CE900B1A77B /* ViewController.swift in Sources */,
 				2281604B21518CE900B1A77B /* AppDelegate.swift in Sources */,
+				2281605E21518D4900B1A77B /* AccountCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +290,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "TableView Reorder/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -299,6 +308,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "TableView Reorder/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
