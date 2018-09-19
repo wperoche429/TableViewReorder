@@ -22,7 +22,11 @@ class ViewController: UIViewController {
     let kVisibleAlpha: CGFloat = 1
     let kInvisibleAlpha: CGFloat = 0
     let kTranslucentAlpha: CGFloat = 0.98
-    let kTransformScaleXY: CGFloat = 1.05
+    let kShadowOffSet = CGSize(width: -5.0, height: 0.0)
+    let kShadowRadius: CGFloat = 5.0
+    let kShadowOpacity: Float = 0.5
+    let kContextScale: CGFloat = 0
+    
     @IBOutlet var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -67,15 +71,15 @@ class ViewController: UIViewController {
     
     func snapshotOfCell(_ inputView: UITableViewCell) -> UIView {
         
-        UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
+        UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, self.kContextScale)
         inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()! as UIImage
         UIGraphicsEndImageContext()
         let snapshotView : UIView = UIImageView(image: image)
         snapshotView.layer.masksToBounds = false
-        snapshotView.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
-        snapshotView.layer.shadowRadius = 2.0
-        snapshotView.layer.shadowOpacity = 0.4
+        snapshotView.layer.shadowOffset = self.kShadowOffSet
+        snapshotView.layer.shadowRadius = self.kShadowRadius
+        snapshotView.layer.shadowOpacity = self.kShadowOpacity
         
         return snapshotView
     }
@@ -91,19 +95,25 @@ class ViewController: UIViewController {
         snapshotView.center = center
         snapshotView.alpha = self.kInvisibleAlpha
         self.tableView.addSubview(snapshotView)
-        UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
-            self.movingCellIsAnimating = true
+        UIView.animate(withDuration: self.kAnimationDuration, animations: { [weak self] () -> Void in
+            guard let strongSelf = self else {
+                return
+            }
+            strongSelf.movingCellIsAnimating = true
             snapshotView.center = center
-            snapshotView.transform = CGAffineTransform(scaleX: self.kTransformScaleXY, y: self.kTransformScaleXY)
-            snapshotView.alpha = self.kTranslucentAlpha
-            cell.alpha = self.kInvisibleAlpha
-        }, completion: { (finished) -> Void in
+            snapshotView.alpha = strongSelf.kVisibleAlpha
+            cell.alpha = strongSelf.kInvisibleAlpha
+        }, completion: { [weak self] (finished) -> Void in
+            guard let strongSelf = self else {
+                return
+            }
+            
             if finished {
-                self.movingCellIsAnimating = false
-                if self.movingCellNeedsToShow {
-                    self.movingCellNeedsToShow = false
-                    UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
-                        cell.alpha = self.kVisibleAlpha
+                strongSelf.movingCellIsAnimating = false
+                if strongSelf.movingCellNeedsToShow {
+                    strongSelf.movingCellNeedsToShow = false
+                    UIView.animate(withDuration: strongSelf.kAnimationDuration, animations: { () -> Void in
+                        cell.alpha = strongSelf.kVisibleAlpha
                     })
                 } else {
                     cell.isHidden = true
@@ -113,7 +123,6 @@ class ViewController: UIViewController {
     }
     
     func updateModelWithMovingCell(indexPath: IndexPath, locationInView: CGPoint) {
-        print("2")
         guard let snapshotView = self.movingCellSnapshotView,
             let intialIndexPath = self.movingCellInitialIndexPath else {
                 return
@@ -129,7 +138,6 @@ class ViewController: UIViewController {
     }
     
     func finalizeReorderOfCell() {
-        print("3")
         guard let initialIndexPath = self.movingCellInitialIndexPath,
             let cell = self.tableView.cellForRow(at: initialIndexPath),
             let snapshotView = self.movingCellSnapshotView else {
@@ -142,16 +150,24 @@ class ViewController: UIViewController {
             cell.isHidden = false
             cell.alpha = self.kInvisibleAlpha
         }
-        UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
+        UIView.animate(withDuration: self.kAnimationDuration, animations: { [weak self] () -> Void in
+            guard let strongSelf = self else {
+                return
+            }
+            
             snapshotView.center = cell.center
             snapshotView.transform = CGAffineTransform.identity
-            snapshotView.alpha = self.kInvisibleAlpha
-            cell.alpha = self.kVisibleAlpha
-        }, completion: { (finished) -> Void in
+            snapshotView.alpha = strongSelf.kInvisibleAlpha
+            cell.alpha = strongSelf.kVisibleAlpha
+        }, completion: {  [weak self] (finished) -> Void in
+            guard let strongSelf = self else {
+                return
+            }
+
             if finished {
-                self.movingCellInitialIndexPath = nil
+                strongSelf.movingCellInitialIndexPath = nil
                 snapshotView.removeFromSuperview()
-                self.movingCellSnapshotView = nil
+                strongSelf.movingCellSnapshotView = nil
             }
         })
     }
