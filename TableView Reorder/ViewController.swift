@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     let kVisibleAlpha: CGFloat = 1
     let kInvisibleAlpha: CGFloat = 0
     let kTranslucentAlpha: CGFloat = 0.98
-    let kTransformScaleXY: CGFloat = 1.0
+    let kTransformScaleXY: CGFloat = 1.05
     @IBOutlet var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -49,6 +49,7 @@ class ViewController: UIViewController {
         let state = longPress.state
         let locationInView = longPress.location(in: self.tableView)
         guard let indexPath = self.tableView.indexPathForRow(at: locationInView) else {
+            self.finalizeReorderOfCell()
             return
         }
         
@@ -86,12 +87,11 @@ class ViewController: UIViewController {
         }
         let snapshotView = snapshotOfCell(cell)
         movingCellSnapshotView = snapshotView
-        var center = cell.center
+        let center = cell.center
         snapshotView.center = center
         snapshotView.alpha = self.kInvisibleAlpha
         self.tableView.addSubview(snapshotView)
         UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
-            center.y = locationInView.y
             self.movingCellIsAnimating = true
             snapshotView.center = center
             snapshotView.transform = CGAffineTransform(scaleX: self.kTransformScaleXY, y: self.kTransformScaleXY)
@@ -113,6 +113,7 @@ class ViewController: UIViewController {
     }
     
     func updateModelWithMovingCell(indexPath: IndexPath, locationInView: CGPoint) {
+        print("2")
         guard let snapshotView = self.movingCellSnapshotView,
             let intialIndexPath = self.movingCellInitialIndexPath else {
                 return
@@ -128,6 +129,7 @@ class ViewController: UIViewController {
     }
     
     func finalizeReorderOfCell() {
+        print("3")
         guard let initialIndexPath = self.movingCellInitialIndexPath,
             let cell = self.tableView.cellForRow(at: initialIndexPath),
             let snapshotView = self.movingCellSnapshotView else {
@@ -169,7 +171,6 @@ extension ViewController: UITableViewDataSource {
         cell.titleLabel.text = itemsArray[indexPath.section]
         cell.titleLabel.textColor = UIColor(red: 0.1, green: 0.6, blue: 0.4, alpha: 1)
         cell.selectionStyle = .none
-        cell.backgroundColor = UIColor.red
         return cell
         
     }
