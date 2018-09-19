@@ -47,17 +47,15 @@ class ViewController: UIViewController {
         self.tableView.estimatedRowHeight = 50.0
     }
     
-    @objc func longPressGestureRecognized(_ gestureRecognizer: UIGestureRecognizer) {
+    @objc func longPressGestureRecognized(_ gestureRecognizer: UILongPressGestureRecognizer) {
         
-        let longPress = gestureRecognizer as! UILongPressGestureRecognizer
-        let state = longPress.state
-        let locationInView = longPress.location(in: self.tableView)
+        let locationInView = gestureRecognizer.location(in: self.tableView)
         guard let indexPath = self.tableView.indexPathForRow(at: locationInView) else {
             self.finalizeReorderOfCell()
             return
         }
         
-        switch state {
+        switch gestureRecognizer.state {
         case UIGestureRecognizerState.began:
             self.createSnapshotOfMovingCell(indexPath: indexPath, locationInView: locationInView)
             
