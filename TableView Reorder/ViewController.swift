@@ -89,7 +89,7 @@ class ViewController: UIViewController {
         var center = cell.center
         snapshotView.center = center
         snapshotView.alpha = self.kInvisibleAlpha
-        self.view.addSubview(snapshotView)
+        self.tableView.addSubview(snapshotView)
         UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
             center.y = locationInView.y
             self.movingCellIsAnimating = true
