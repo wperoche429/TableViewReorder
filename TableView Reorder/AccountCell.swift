@@ -10,6 +10,7 @@ import UIKit
 
 class AccountCell: UITableViewCell {
 
+    static let kAccountCellIdentifier = "AccountCell"
     @IBOutlet var titleLabel: UILabel!
     override func awakeFromNib() {
         super.awakeFromNib()

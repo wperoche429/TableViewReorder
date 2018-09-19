@@ -37,8 +37,8 @@ class ViewController: UIViewController {
     }
     
     func setupTableView() {
-        let nib = UINib(nibName: "AccountCell", bundle: nil)
-        self.tableView.register(nib, forCellReuseIdentifier: "AccountCell")
+        let nib = UINib(nibName: AccountCell.kAccountCellIdentifier, bundle: nil)
+        self.tableView.register(nib, forCellReuseIdentifier: AccountCell.kAccountCellIdentifier)
         self.tableView.rowHeight = UITableViewAutomaticDimension
         self.tableView.estimatedRowHeight = 50.0
     }
@@ -60,7 +60,7 @@ class ViewController: UIViewController {
             self.updateModelWithMovingCell(indexPath: indexPath, locationInView: locationInView)
             
         default:
-            self.finalizeReorder()
+            self.finalizeReorderOfCell()
         }
     }
     
@@ -71,9 +71,8 @@ class ViewController: UIViewController {
         UIGraphicsEndImageContext()
         let snapshotView : UIView = UIImageView(image: image)
         snapshotView.layer.masksToBounds = false
-        snapshotView.layer.cornerRadius = 0.0
         snapshotView.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
-        snapshotView.layer.shadowRadius = 5.0
+        snapshotView.layer.shadowRadius = 2.0
         snapshotView.layer.shadowOpacity = 0.4
         return snapshotView
     }
@@ -126,7 +125,7 @@ class ViewController: UIViewController {
         }
     }
     
-    func finalizeReorder() {
+    func finalizeReorderOfCell() {
         guard let initialIndexPath = self.movingCellInitialIndexPath,
             let cell = self.tableView.cellForRow(at: initialIndexPath),
             let snapshotView = self.movingCellSnapshotView else {
@@ -164,7 +163,7 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "AccountCell") as! AccountCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: AccountCell.kAccountCellIdentifier) as! AccountCell
         cell.titleLabel.text = itemsArray[indexPath.section]
         return cell
         
@@ -172,7 +171,7 @@ extension ViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
         if section == itemsArray.count - 1 {
-            return 10
+            return 0
         }
         return 5
     }
