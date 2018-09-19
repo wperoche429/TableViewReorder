@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     let kVisibleAlpha: CGFloat = 1
     let kInvisibleAlpha: CGFloat = 0
     let kTranslucentAlpha: CGFloat = 0.98
-    let kTransformScaleXY: CGFloat = 1.05
+    let kTransformScaleXY: CGFloat = 1.0
     @IBOutlet var tableView: UITableView!
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,7 +64,8 @@ class ViewController: UIViewController {
         }
     }
     
-    func snapshotOfCell(_ inputView: UIView) -> UIView {
+    func snapshotOfCell(_ inputView: UITableViewCell) -> UIView {
+        
         UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
         inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
         let image = UIGraphicsGetImageFromCurrentImageContext()! as UIImage
@@ -74,6 +75,7 @@ class ViewController: UIViewController {
         snapshotView.layer.shadowOffset = CGSize(width: -5.0, height: 0.0)
         snapshotView.layer.shadowRadius = 2.0
         snapshotView.layer.shadowOpacity = 0.4
+        
         return snapshotView
     }
     
@@ -87,7 +89,7 @@ class ViewController: UIViewController {
         var center = cell.center
         snapshotView.center = center
         snapshotView.alpha = self.kInvisibleAlpha
-        tableView.addSubview(snapshotView)
+        self.view.addSubview(snapshotView)
         UIView.animate(withDuration: self.kAnimationDuration, animations: { () -> Void in
             center.y = locationInView.y
             self.movingCellIsAnimating = true
@@ -146,7 +148,7 @@ class ViewController: UIViewController {
         }, completion: { (finished) -> Void in
             if finished {
                 self.movingCellInitialIndexPath = nil
-                self.movingCellSnapshotView!.removeFromSuperview()
+                snapshotView.removeFromSuperview()
                 self.movingCellSnapshotView = nil
             }
         })
@@ -165,6 +167,9 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: AccountCell.kAccountCellIdentifier) as! AccountCell
         cell.titleLabel.text = itemsArray[indexPath.section]
+        cell.titleLabel.textColor = UIColor(red: 0.1, green: 0.6, blue: 0.4, alpha: 1)
+        cell.selectionStyle = .none
+        cell.backgroundColor = UIColor.red
         return cell
         
     }
